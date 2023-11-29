@@ -24,7 +24,7 @@ class RtspSystem(GstRtspServer.RTSPMediaFactory):
 
     def send_data(self, data):
         self.data = data
-        print(self.data)
+        # print(self.data)
 
     def start(self):
         t = threading.Thread(target=self._thread_rtsp)
@@ -64,7 +64,7 @@ class RTSPServer(GstRtspServer.RTSPServer):
         # self.auth = AuthSystem()
         self.rtsp.set_shared(True)
         self.create_source()
-        self.create_socket()
+        # self.create_socket()
         self.set_address(SERVER_ADDRESS)
         self.set_service(SERVER_PORT)
         # self.set_auth(auth=self.auth)
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     
     # print(ip, port, auth)
 
-    oak = Oak(fps=30)
+    oak = Oak(fps=20)
     pipeline = oak.get_pipeline()
     device_infos = oak.get_device_info()
 

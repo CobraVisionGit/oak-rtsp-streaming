@@ -1,0 +1,24 @@
+Installation prerequisites (Ubuntu): 
+
+
+
+sudo apt-get install ffmpeg gstreamer-1.0 gir1.2-gst-rtsp-server-1.0 libgirepository1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-good gstreamer1.0-plugins-base
+
+
+sudo apt install libcairo2-dev pkg-config python3-dev (for pycario)
+
+
+
+Start RTSP Server:
+
+GST_DEBUG=2 python rtsp-test.py //GST_DEBUG gives more robust error messages
+
+
+
+Command to view stream with ffplay:
+
+ffplay -fflags nobuffer -fflags discardcorrupt -flags low_delay -framedrop rtsp://localhost:8554/preview
+
+or 
+
+ffplay -fflags discardcorrupt -framedrop rtsp://97.94.229.39:8554/preview
