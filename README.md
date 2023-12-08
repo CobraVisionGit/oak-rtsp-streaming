@@ -1,5 +1,12 @@
 # oak-rtsp-streaming
 
+The oak-rtsp-streaming project is meant to create a means for users to connect to and injest the live streams from deployed oak cameras. It allows for users to monitor 
+in their sites in real time. This is especially useful for users who have pre-existing VMS software who are looking to injest oak camera streams for monitoring purposes. 
+
+This main function of the project instantiates an rtsp streaming server utilizing gstreamer backend. The script connects to an oak device and feeds the encoded frames into the rtsp server. 
+The stream can be configured to generate multiple stream types both h264 and h265 encoding has been tested. Once the camera and the server has been initialized the rtsp stream is setup
+can be consumed remotely.
+
 ## Project Structure
 
 ```
