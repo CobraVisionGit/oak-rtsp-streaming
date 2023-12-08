@@ -54,3 +54,7 @@ ffplay -fflags nobuffer -fflags discardcorrupt -flags low_delay -framedrop rtsp:
 ffplay -fflags discardcorrupt -framedrop rtsp://{IP}:{port}/preview
 ```
 
+### Sources
+Script was built off an old demo provided by Luxonis:
+
+Original script source: https://github.com/luxonis/depthai-experiments/tree/master/gen2-rtsp-streaming
