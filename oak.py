@@ -1,3 +1,5 @@
+import atexit
+import signal
 import depthai as dai
 
 class Oak():
@@ -8,6 +10,7 @@ class Oak():
     self.videnc = self.pipeline.create(dai.node.VideoEncoder)
     self.veOut = self.pipeline.create(dai.node.XLinkOut)
     self.fps = fps
+    self.running = True
 
     self._create_color_cam()
     self._create_encoder()
@@ -23,7 +26,7 @@ class Oak():
     self.colorCam.video.link(self.videnc.input)
     self.veOut.setStreamName("encoded")
     self.videnc.bitstream.link(self.veOut.input)
-    
+
   def get_pipeline(self):
     return self.pipeline
   
@@ -31,5 +34,30 @@ class Oak():
     return self.device_infos
 
   def get_device_state(self):
-    pass
+    return self.running
+  
+  def restart(self):
+      if self._running:
+          self._running = None
+
+      devices = self.devices.copy()
+      self.devices.clear()
+
+      for device in devices:
+          device.internal.close()
+
+  def _process_exit(self):
+        self.stop()
+        # self.on_exit()
+
+  def stop(self):
+        atexit.unregister(self._process_exit)
+        signal.signal(signal.SIGINT, signal.default_int_handler)
+        signal.signal(signal.SIGTERM, signal.SIG_DFL)
+        signal.signal(signal.SIGQUIT, signal.SIG_DFL) # comment out if using windows machine
+
+        self.running = False
+        # self.loop.stop()
+        # self._loop_thread.join(timeout=3)
+        self.restart()
 

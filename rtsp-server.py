@@ -11,6 +11,17 @@ from gi.repository import Gst, GstRtspServer, GLib
 
 # Gst.init()
 
+"""
+This script initializes an rtsp streaming server utilizing the gstreamer backend. The script connects to a connected oak device and feeds the encoded frames into the rtsp server. 
+The stream can be configured to generate multiple stream types both h264 and h265 encoding has been tested. Once the camera and the server has been initialized the rtsp stream is setup
+can be consumed remotely. 
+
+
+
+Original script source: https://github.com/luxonis/depthai-experiments/tree/master/gen2-rtsp-streaming
+"""
+
+
 class RtspSystem(GstRtspServer.RTSPMediaFactory):
     def __init__(self, **properties):
         super(RtspSystem, self).__init__(**properties)
@@ -39,6 +50,7 @@ class RtspSystem(GstRtspServer.RTSPMediaFactory):
             retval = src.emit('push-buffer', Gst.Buffer.new_wrapped(self.data.tobytes()))
             if retval != Gst.FlowReturn.OK:
                 print(retval)
+            # else: print(retval)
 
     # def do_create_element(self, url):
     def do_create_element(self, url):
@@ -55,8 +67,6 @@ class AuthSystem(GstRtspServer.RTSPAuth):
         # self.new()
         # print(self.new())
     
-
-
 class RTSPServer(GstRtspServer.RTSPServer):
     def __init__(self, **properties):
         super(RTSPServer, self).__init__(**properties)
@@ -83,6 +93,10 @@ class RTSPServer(GstRtspServer.RTSPServer):
         # print(data)
     def get_stream_info(self):
         return {"ip": self.get_address(), "port": self.get_bound_port(), "auth": self.get_auth(), "session pool": self.get_session_pool, "thread pool": self.get_thread_pool}
+    
+    def get_buffer_size(self):
+        return self.rtsp.get_buffer_size()
+    
 
 if __name__ == "__main__":
     import depthai as dai
@@ -90,11 +104,12 @@ if __name__ == "__main__":
     server = RTSPServer()
     # ip, port, auth = server.get_stream_info()
     stream_info = server.get_stream_info()
+    # print(server.get_buffer_size())
     print(stream_info)
     
     # print(ip, port, auth)
 
-    oak = Oak(fps=20)
+    oak = Oak(fps=10)
     pipeline = oak.get_pipeline()
     device_infos = oak.get_device_info()
 
@@ -120,6 +135,10 @@ if __name__ == "__main__":
         encoded = device.getOutputQueue("encoded", maxSize=30, blocking=True)
         print(f"Setup finished, RTSP stream available under \"rtsp://{stream_info['ip']}:{stream_info['port']}/preview\"")
         while True:
-            data = encoded.get().getData()
-            # print(data)
-            server.send_data(data)
+            try:
+                data = encoded.get().getData()
+                # print(data)
+                server.send_data(data)
+            except RuntimeError as e:
+                # oak.restart()
+                print(e)
